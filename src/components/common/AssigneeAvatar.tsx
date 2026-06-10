@@ -1,6 +1,6 @@
 import React from 'react';
 import { Avatar, Tooltip } from '@mui/material';
-import type {  Assignee  } from '../../types';
+import type { Assignee } from '../../types';
 
 interface AssigneeAvatarProps {
   assignee: Assignee;
@@ -8,7 +8,6 @@ interface AssigneeAvatarProps {
 }
 
 const AssigneeAvatar: React.FC<AssigneeAvatarProps> = ({ assignee, size = 32 }) => {
-  // Simple deterministic color generation based on name length or first char
   const stringToColor = (string: string) => {
     let hash = 0;
     for (let i = 0; i < string.length; i += 1) {
@@ -22,9 +21,17 @@ const AssigneeAvatar: React.FC<AssigneeAvatarProps> = ({ assignee, size = 32 }) 
     return color;
   };
 
+  const initials = assignee.initials || assignee.name
+    .split(' ')
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+
   return (
     <Tooltip title={assignee.name} arrow placement="top">
       <Avatar
+        aria-label={assignee.name}
         src={assignee.avatarUrl}
         sx={{
           width: size,
@@ -36,7 +43,7 @@ const AssigneeAvatar: React.FC<AssigneeAvatarProps> = ({ assignee, size = 32 }) 
           borderColor: 'background.paper'
         }}
       >
-        {assignee.initials}
+        {initials}
       </Avatar>
     </Tooltip>
   );

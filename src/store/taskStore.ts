@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Task, Status } from '../types';
 import { v4 as uuidv4 } from 'uuid';
+import { ASSIGNEES } from '../data/assignees';
 
 interface TaskState {
   tasks: Task[];
@@ -11,6 +12,9 @@ interface TaskState {
   moveTask: (id: string, newStatus: Status, newIndex?: number) => void;
 }
 
+const getDueDate = (daysFromNow: number) =>
+  new Date(Date.now() + daysFromNow * 24 * 60 * 60 * 1000).toISOString();
+
 const mockTasks: Task[] = [
   {
     id: uuidv4(),
@@ -18,6 +22,8 @@ const mockTasks: Task[] = [
     description: 'Look into similar products in the market to understand common patterns and missing features.',
     priority: 'Medium',
     status: 'To Do',
+    assignee: ASSIGNEES[1],
+    dueDate: getDueDate(3),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
@@ -27,6 +33,8 @@ const mockTasks: Task[] = [
     description: 'Set up MUI theme, typography, and color palette in the codebase.',
     priority: 'High',
     status: 'In Progress',
+    assignee: ASSIGNEES[0],
+    dueDate: getDueDate(1),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
@@ -36,6 +44,8 @@ const mockTasks: Task[] = [
     description: 'Create Vite project with React and TypeScript.',
     priority: 'Low',
     status: 'Done',
+    assignee: ASSIGNEES[2],
+    dueDate: getDueDate(7),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }

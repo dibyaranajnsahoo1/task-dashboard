@@ -13,9 +13,16 @@ interface TaskCardProps {
   isNew?: boolean;
 }
 
+const unassignedAssignee = {
+  id: 'unassigned',
+  name: 'Unassigned',
+  initials: 'UA',
+};
+
 const TaskCard: React.FC<TaskCardProps> = ({ task, isNew = false }) => {
   const navigate = useNavigate();
   const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== 'Done';
+  const cardAssignee = task.assignee ?? unassignedAssignee;
 
   return (
     <Card
@@ -57,9 +64,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isNew = false }) => {
             </Typography>
           </Box>
 
-          {task.assignee && (
-            <AssigneeAvatar assignee={task.assignee} size={28} />
-          )}
+          <AssigneeAvatar assignee={cardAssignee} size={28} />
         </Box>
 
         {/* Tags */}

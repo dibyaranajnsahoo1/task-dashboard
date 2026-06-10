@@ -2,27 +2,22 @@ import React from 'react';
 import { Box, Button, Paper } from '@mui/material';
 import ArrowBackRounded from '@mui/icons-material/ArrowBackRounded';
 import { useNavigate } from 'react-router-dom';
-import TaskForm from '../components/Task/TaskForm';
+import TaskForm, { type TaskFormData } from '../components/Task/TaskForm';
 import { useTaskStore } from '../store/taskStore';
 import { useNotificationStore } from '../store/notificationStore';
-import type { Assignee } from '../types';
+import { getAssigneeById } from '../data/assignees';
 
 const CreateTaskPage: React.FC = () => {
   const navigate = useNavigate();
   const { addTask } = useTaskStore();
   const { showNotification } = useNotificationStore();
 
-  // Mock current user as assignee default
-  const currentUser: Assignee = {
-    id: 'user-1',
-    name: 'John Doe',
-    initials: 'JD'
-  };
-
-  const handleSubmit = (data: any) => {
+  const handleSubmit = (data: TaskFormData) => {
+    const { assigneeId, ...taskData } = data;
     const newTask = addTask({
-      ...data,
-      assignee: currentUser,
+      ...taskData,
+      description: taskData.description || '',
+      assignee: getAssigneeById(assigneeId),
     });
     // Store new task id so BoardView can highlight it
     if (newTask?.id) {

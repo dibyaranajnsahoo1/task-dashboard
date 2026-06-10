@@ -4,11 +4,13 @@ import ArrowBackRounded from '@mui/icons-material/ArrowBackRounded';
 import DeleteOutlineRounded from '@mui/icons-material/DeleteOutlineRounded';
 import AccessTimeRounded from '@mui/icons-material/AccessTimeRounded';
 import { useNavigate, useParams } from 'react-router-dom';
-import TaskForm from '../components/Task/TaskForm';
+import TaskForm, { type TaskFormData } from '../components/Task/TaskForm';
 import { useTaskStore } from '../store/taskStore';
 import { useNotificationStore } from '../store/notificationStore';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import PriorityChip from '../components/common/PriorityChip';
+import AssigneeAvatar from '../components/common/AssigneeAvatar';
+import { getAssigneeById } from '../data/assignees';
 import { format } from 'date-fns';
 
 const TaskDetailPage: React.FC = () => {
@@ -29,8 +31,13 @@ const TaskDetailPage: React.FC = () => {
     );
   }
 
-  const handleSubmit = (data: any) => {
-    updateTask(task.id, data);
+  const handleSubmit = (data: TaskFormData) => {
+    const { assigneeId, ...taskData } = data;
+    updateTask(task.id, {
+      ...taskData,
+      description: taskData.description || '',
+      assignee: getAssigneeById(assigneeId),
+    });
     showNotification('Task updated successfully!');
     navigate('/');
   };
@@ -69,6 +76,14 @@ const TaskDetailPage: React.FC = () => {
       <Box sx={{ display: 'flex', gap: 2, mb: 3, flexWrap: 'wrap', alignItems: 'center' }}>
         <PriorityChip priority={task.priority} />
         <Chip label={task.status} size="small" variant="outlined" />
+        {task.assignee && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+            <AssigneeAvatar assignee={task.assignee} size={24} />
+            <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>
+              {task.assignee.name}
+            </Typography>
+          </Box>
+        )}
         {task.dueDate && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: isOverdue ? 'error.main' : 'text.secondary' }}>
             <AccessTimeRounded sx={{ fontSize: 16 }} />

@@ -1,5 +1,6 @@
 import React from 'react';
 import { 
+  Avatar,
   Box, 
   Button, 
   TextField, 
@@ -12,12 +13,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useNavigate } from 'react-router-dom';
 import type { Task } from '../../types';
+import { ASSIGNEES } from '../../data/assignees';
 
 const taskSchema = z.object({
   title: z.string().min(1, 'Title is required').max(100),
   description: z.string().max(500).optional(),
   priority: z.enum(['Low', 'Medium', 'High']),
   status: z.enum(['To Do', 'In Progress', 'Done']),
+  assigneeId: z.string().min(1, 'Assignee is required'),
   dueDate: z.string().min(1, 'Due date is required').refine(val => {
     const selectedDate = new Date(val);
     const today = new Date();
@@ -27,7 +30,7 @@ const taskSchema = z.object({
   tags: z.array(z.string()).optional(),
 });
 
-type TaskFormData = z.infer<typeof taskSchema>;
+export type TaskFormData = z.infer<typeof taskSchema>;
 
 interface TaskFormProps {
   initialData?: Task;
@@ -50,6 +53,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ initialData, onSubmit, onCancel, is
       description: initialData?.description || '',
       priority: initialData?.priority || 'Medium',
       status: initialData?.status || 'To Do',
+      assigneeId: initialData?.assignee?.id || ASSIGNEES[0].id,
       dueDate: initialData?.dueDate ? new Date(initialData.dueDate).toISOString().split('T')[0] : '',
       tags: initialData?.tags || [],
     },
@@ -70,7 +74,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ initialData, onSubmit, onCancel, is
       </Typography>
       
       <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' }, gap: 3 }}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: 3 }}>
           <Box sx={{ gridColumn: '1 / -1' }}>
             <Controller
               name="title"
@@ -164,6 +168,44 @@ const TaskForm: React.FC<TaskFormProps> = ({ initialData, onSubmit, onCancel, is
                   error={!!errors.dueDate}
                   helperText={errors.dueDate?.message}
                 />
+              )}
+            />
+          </Box>
+
+          <Box>
+            <Controller
+              name="assigneeId"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  select
+                  required
+                  fullWidth
+                  label="Assignee"
+                  error={!!errors.assigneeId}
+                  helperText={errors.assigneeId?.message}
+                >
+                  {ASSIGNEES.map((assignee) => (
+                    <MenuItem key={assignee.id} value={assignee.id}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Avatar
+                          src={assignee.avatarUrl}
+                          sx={{
+                            width: 24,
+                            height: 24,
+                            fontSize: '0.7rem',
+                            fontWeight: 700,
+                            bgcolor: 'primary.main',
+                          }}
+                        >
+                          {assignee.initials}
+                        </Avatar>
+                        <Typography variant="body2">{assignee.name}</Typography>
+                      </Box>
+                    </MenuItem>
+                  ))}
+                </TextField>
               )}
             />
           </Box>

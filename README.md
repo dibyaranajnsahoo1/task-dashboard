@@ -125,6 +125,8 @@ The board page is the main screen of the app. It shows:
 - Three Kanban columns
 - Task cards inside each column
 
+Each task card displays the task title, priority chip, due date, and an assignee avatar/initials indicator. If an older or imported task does not have an assignee, the card shows an `UA` unassigned avatar fallback.
+
 The board uses `DragDropContext` from `@hello-pangea/dnd`. When a task is dropped into a new column, the `moveTask` action updates its status in the Zustand store.
 
 ### 2. Create Task Page
@@ -136,7 +138,7 @@ This page displays the reusable `TaskForm` component in create mode.
 When the form is submitted:
 
 - A new task is created with `addTask`.
-- The default assignee is mocked as `John Doe`.
+- The selected assignee is resolved from the shared assignee list.
 - The created task ID is saved temporarily in `sessionStorage`.
 - The app navigates back to the board.
 - The new task is highlighted on the board.
@@ -152,6 +154,7 @@ Users can:
 
 - View task metadata.
 - Edit task fields.
+- Change the task assignee.
 - Save changes.
 - Delete the task.
 
@@ -192,6 +195,9 @@ src/
       ConfirmDialog.tsx
       NotificationProvider.tsx
       PriorityChip.tsx
+
+  data/
+    assignees.ts
 
   pages/
     BoardPage.tsx
@@ -295,9 +301,12 @@ Validation rules include:
 - `description` is optional and limited to 500 characters.
 - `priority` must be `Low`, `Medium`, or `High`.
 - `status` must be `To Do`, `In Progress`, or `Done`.
+- `assigneeId` is required and maps to an assignee from `src/data/assignees.ts`.
 - `dueDate` is required.
 - `dueDate` cannot be earlier than today.
 - `tags` are optional and can be entered through a free-solo autocomplete field.
+
+The form includes an assignee dropdown with avatar initials, and both create and edit flows persist the selected assignee on the task.
 
 ---
 
@@ -325,9 +334,9 @@ Important UI pieces:
 - `Navbar` contains the app title and theme toggle.
 - `BoardView` controls board layout, filters, and drag-and-drop.
 - `BoardColumn` renders each Kanban column.
-- `TaskCard` renders individual task cards.
+- `TaskCard` renders individual task cards with title, priority, due date, and assignee avatar/initials.
 - `PriorityChip` displays priority labels consistently.
-- `AssigneeAvatar` renders assignee initials/avatar.
+- `AssigneeAvatar` renders assignee initials/avatar with tooltip and fallback initials support.
 - `ConfirmDialog` is used before deleting a task.
 - `NotificationProvider` shows global snackbar messages.
 
@@ -411,6 +420,7 @@ npm run preview
 
 - The project is frontend-only and uses local browser storage instead of an API.
 - Initial mock tasks are defined in `taskStore.ts`.
+- Shared assignee options are defined in `src/data/assignees.ts`.
 - Tasks and theme preference persist through Zustand's `persist` middleware.
 - New task highlighting uses `sessionStorage` to pass the created task ID from the create page back to the board.
 - MUI icon imports use direct paths like `@mui/icons-material/AddRounded` instead of the package barrel import. This keeps test startup lighter and avoids opening the entire icon package during Vitest runs.
