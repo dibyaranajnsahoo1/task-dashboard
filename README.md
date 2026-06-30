@@ -459,7 +459,7 @@ It is structured to be easy to understand, extend, and present as a frontend ass
 
 **Step 2 (Backend)**
 - Scaffolded the Express route and controller structure
-- Generated the SQLite migration SQL and `better-sqlite3` integration
+- Generated the initial SQLite migration SQL and boilerplate database connection
 - Helped write the Supertest integration test structure
 
 ---
@@ -468,7 +468,7 @@ It is structured to be easy to understand, extend, and present as a frontend ass
 
 When building the `TaskForm`, AI initially suggested using the MUI `Grid` component with `item` and `xs` props — the MUI v5 pattern. This caused TypeScript errors in MUI v6 because `Grid` was restructured. I recognised the issue and replaced the entire layout with a CSS Grid via `Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}`, which is both more reliable and avoids the MUI Grid abstraction entirely. This was a deliberate departure from the AI's output.
 
-Similarly, for the backend, AI initially generated the `database.ts` singleton using a module-level `const db = new Database(...)` which would have broken tests (no way to reset between test files). I redesigned it as a lazy-initialized getter with an explicit `resetDb()` function specifically to support the in-memory test isolation pattern.
+Similarly, for the backend, AI initially suggested using `better-sqlite3`. While this is the industry standard for SQLite in Node, it requires a native C++ compile step (`node-gyp`). When testing on a Windows machine without the C++ build tools installed, it completely failed to install. I immediately recognized that this would cause a terrible experience if a reviewer tried to run `npm install` without the correct SDKs. I made the architectural decision to rip out `better-sqlite3` and replace it with `sql.js` (a WASM port of SQLite). This kept the exact same synchronous API but guaranteed zero installation friction for the reviewer. AI did not suggest this—I had to override it to prioritize reviewer experience and cross-platform stability.
 
 ---
 
