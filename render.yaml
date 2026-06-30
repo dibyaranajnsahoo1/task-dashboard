@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: paperplane-backend-api
+    env: node
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PORT
+        value: 10000
+    # SQLite requires persistent storage to survive deploys/restarts
+    # Render Free tier does not support disks. If you deploy on free tier, 
+    # the SQLite DB will reset on every deploy (which is fine for a demo).
+    # If on a paid tier, uncomment the disk configuration below:
+    # disk:
+    #   name: sqlite-data
+    #   mountPath: /opt/render/project/src/backend/data
+    #   sizeGB: 1

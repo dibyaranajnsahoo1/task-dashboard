@@ -1,6 +1,6 @@
 # Task Dashboard - Task Management App
 
-TaskMaster is a frontend Kanban-style task management application built with React, TypeScript, Vite, Material UI, Zustand, React Hook Form, Zod, React Router, and Vitest.
+Task Dashboard is a frontend Kanban-style task management application built with React, TypeScript, Vite, Material UI, Zustand, React Hook Form, Zod, React Router, and Vitest.
 
 The app lets a user create, edit, delete, filter, and move tasks across a three-column board: `To Do`, `In Progress`, and `Done`. It is designed as a clean assignment project that demonstrates component separation, local state persistence, form validation, routing, drag-and-drop behavior, theming, and unit testing.
 
@@ -442,3 +442,39 @@ TaskMaster demonstrates a complete React task board workflow:
 - Focused unit tests.
 
 It is structured to be easy to understand, extend, and present as a frontend assignment project.
+
+---
+
+## AI Usage
+
+**Tools used**:Claude, Codex, Antigravity (Google DeepMind AI coding assistant) — used throughout both Step 1 and Step 2.
+
+### How AI was used
+
+**Step 1 (Frontend)**
+- Scaffolded MUI component boilerplate (TaskCard, BoardColumn layouts)
+- Generated Zod schema definitions for the form validation
+- Helped debug MUI v6 `slotProps` API migration errors (the old `InputProps`/`PaperProps` pattern was deprecated)
+- Generated initial unit test structure for Vitest + React Testing Library
+
+**Step 2 (Backend)**
+- Scaffolded the Express route and controller structure
+- Generated the SQLite migration SQL and `better-sqlite3` integration
+- Helped write the Supertest integration test structure
+
+---
+
+### One concrete example where AI's suggestion was wrong
+
+When building the `TaskForm`, AI initially suggested using the MUI `Grid` component with `item` and `xs` props — the MUI v5 pattern. This caused TypeScript errors in MUI v6 because `Grid` was restructured. I recognised the issue and replaced the entire layout with a CSS Grid via `Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}`, which is both more reliable and avoids the MUI Grid abstraction entirely. This was a deliberate departure from the AI's output.
+
+Similarly, for the backend, AI initially generated the `database.ts` singleton using a module-level `const db = new Database(...)` which would have broken tests (no way to reset between test files). I redesigned it as a lazy-initialized getter with an explicit `resetDb()` function specifically to support the in-memory test isolation pattern.
+
+---
+
+### Where AI meaningfully accelerated work
+
+**Step 1**: Generating the MUI theme file (`theme/index.ts`) with both light and dark palettes, typography, and component overrides would have taken significant time to write manually. AI produced a solid 100-line starting point in seconds that I then refined with the exact color palette I wanted.
+
+**Step 2**: The Zod validation schemas and the dynamic `SET` clause builder in `updateTask` (partial update pattern) were generated quickly by AI and required only minor adjustments for TypeScript strict-mode compliance.
+
